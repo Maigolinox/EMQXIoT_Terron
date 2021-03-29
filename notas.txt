@@ -1,0 +1,109 @@
+*******
+   1
+*******
+Puertos que abrimos cuando creamos la instancia:
+SSH 22
+FTP 21
+HTTP 80
+HTTPS 443
+VESTA 8083
+
+
+*******
+   2
+*******
+Comandos utilizados para instalar VESTA
+
+
+# Descargar script de instalación
+curl -O http://vestacp.com/pub/vst-install.sh
+
+# Ejecutar instalación sin servidor de correos
+bash vst-install.sh --nginx yes --apache yes --phpfpm no --named yes --remi yes --vsftpd yes --proftpd no --iptables yes --fail2ban yes --quota no --exim no --dovecot no --spamassassin no --clamav no --softaculous no --mysql yes --postgresql no --hostname cursoiot.ga --email somosioticos@gmail.com --password 121212
+
+
+
+*******
+3 para darle ssl al panel
+*******
+ln -s /home/username/conf/web/ssl.website.crt /usr/local/vesta/ssl/certificate.crt
+ln -s /home/username/conf/web/ssl.website.key /usr/local/vesta/ssl/certificate.key
+
+
+****
+ 4
+****
+Puertos a abrir tanto en firewall de vesta como en aws
+1883,8883,8093,8094,8090,18083,8080
+
+***
+5
+***
+Descargar y descomprimir emqx
+wget https://www.emqx.io/downloads/broker/v3.0.1/emqx-ubuntu18.04-v3.0.1.zip
+unzip emqx-ubuntu18.04-v3.0.1.zip
+
+ejecutar emqx
+./bin/emqx start
+
+tudominio:18083 para acceder al panel
+
+*****
+6 Para wss
+****
+ln -s /home/admin/conf/web/ssl.tudominio.crt /emqx/etc/certs/cert.pem
+ln -s /home/admin/conf/web/ssl.tudominio.key /emqx/etc/certs/key.pem
+
+****
+7  Para forzar https y sin www crear archivo .htaccess con:
+****
+
+RewriteEngine on
+
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+RewriteCond %{HTTPS} !on
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+***
+8 INSTALAR NODEJS
+***
+sudo apt update
+apt install nodejs
+apt install npm
+
+// para inicializar proyecto
+npm init
+
+
+****
+9 PARA HACER MÁS COMODO EL DESARROLLO
+****
+//LINK
+ln -s /home/admin/web/cursoiot.ga/public_html/node/index.js /home/ubuntu/index.js
+
+//NODEMON
+npm install -g nodemon
+
+//pm2
+npm install pm2 -g
+
+
+****
+11 PINOUT TFT ILI9341 -> ESP32
+****
+
+RC522		esp32 nodemcu
+1 (VCC)		(VCC)
+2 (GND)		GND
+3 (CS)		5
+4 (RESET)	4
+5 DC		22
+6 MOSI		23
+7 SCK		18
+8 LED		R22e -> 3,3V 
+9 MISO		19
+
+
+
